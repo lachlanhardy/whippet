@@ -9,7 +9,7 @@ exports.get: (path, file, process) ->
   exports.routes[path] ||= {}
   exports.routes[path].GET: ->
     fs.readFileSync file
-  exports.routes[path].process: process
+  exports.routes[path].process: process if process?
 
 exports.error: (res) ->
   res.writeHead 404, {'Content-Type': 'text/html'}
@@ -19,22 +19,22 @@ http.createServer((req, res) ->
   path: url.parse(req.url).pathname
   if path in exports.routes
 
+    types: {
+      css : "text/css"
+      html: "text/html"
+      js  : "text/javascript"
+    }
+
     extension: path.match(/(.*)\.(.+)/)
-    if extension isnt null
-      switch extension[2]
-        when "css"
-          contentType: "text/css"
-        when "html"
-          contentType: "text/html"
-        when "js"
-          contentType: "text/javascript"
-        else
-          sys.puts "case not handled yet"
+    if extension?
+      contentType: types[extension[2]] 
     else
       contentType: "text/html"
 
-    exports.routes[path].process()
+    if exports.routes[path].process
+      exports.routes[path].process()
     file: exports.routes[path].GET
+    sys.puts file
     if file?
       res.writeHead 200, {'Content-Type': contentType}
       res.write file()

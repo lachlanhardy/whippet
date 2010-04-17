@@ -10,7 +10,9 @@
     exports.routes[path].GET = function GET() {
       return fs.readFileSync(file);
     };
-    return exports.routes[path].process = process;
+    if ((typeof process !== "undefined" && process !== null)) {
+      return (exports.routes[path].process = process);
+    }
   };
   exports.error = function error(res) {
     res.writeHead(404, {
@@ -19,25 +21,19 @@
     return res.write("No route matched.");
   };
   http.createServer(function(req, res) {
-    var _a, contentType, extension, file, path;
+    var contentType, extension, file, path, types;
     path = url.parse(req.url).pathname;
     if (path in exports.routes) {
+      types = {
+        css: "text/css",
+        html: "text/html",
+        js: "text/javascript"
+      };
       extension = path.match(/(.*)\.(.+)/);
-      if (extension !== null) {
-        if ((_a = extension[2]) === "css") {
-          contentType = "text/css";
-        } else if (_a === "html") {
-          contentType = "text/html";
-        } else if (_a === "js") {
-          contentType = "text/javascript";
-        } else {
-          sys.puts("case not handled yet");
-        }
-      } else {
-        contentType = "text/html";
-      }
-      exports.routes[path].process();
+      (typeof extension !== "undefined" && extension !== null) ? (contentType = types[extension[2]]) : (contentType = "text/html");
+      exports.routes[path].process ? exports.routes[path].process() : null;
       file = exports.routes[path].GET;
+      sys.puts(file);
       if ((typeof file !== "undefined" && file !== null)) {
         res.writeHead(200, {
           'Content-Type': contentType
