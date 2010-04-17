@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en-au">
+<head>
+<title>Noded Coffee</title>
+</head>
+<body>
+    <h1>This is a page.</h1>
+
+    <script src="jquery.js"></script>
+    <script src="coffee.js"></script>
+    <script type="text/coffeescript">
+        puts: (msg) -> $("<p/>").text(msg).appendTo(document.body)
+        $ ->
+          puts "That worked. I think. And I freaken love this shit."
+    </script>
+</body>
+</html>
+
