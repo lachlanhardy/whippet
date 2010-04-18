@@ -35,7 +35,6 @@ http.createServer((req, res) ->
       file: exports.routes[path].GET
       if file?
         res.writeHead 200, {'Content-Type': contentType}
-        
         res.write file()
       else
         exports.error(res)
