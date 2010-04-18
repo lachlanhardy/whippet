@@ -21,7 +21,7 @@
     return res.write("No route matched.");
   };
   http.createServer(function(req, res) {
-    var contentType, extension, file, path, types;
+    var _a, contentType, deliver, extension, path, types;
     path = url.parse(req.url).pathname;
     if (path in exports.routes) {
       types = {
@@ -31,22 +31,27 @@
       };
       extension = path.match(/(.*)\.(.+)/);
       (typeof extension !== "undefined" && extension !== null) ? (contentType = types[extension[2]]) : (contentType = "text/html");
-      exports.routes[path].process ? exports.routes[path].process() : null;
-      file = exports.routes[path].GET;
-      sys.puts(file);
-      if ((typeof file !== "undefined" && file !== null)) {
-        res.writeHead(200, {
-          'Content-Type': contentType
-        });
-        res.write(file());
-      } else {
-        exports.error(res);
-      }
-      sys.puts(path);
+      deliver = function deliver() {
+        var file;
+        file = exports.routes[path].GET;
+        if ((typeof file !== "undefined" && file !== null)) {
+          res.writeHead(200, {
+            'Content-Type': contentType
+          });
+          res.write(file());
+        } else {
+          exports.error(res);
+        }
+        sys.puts(path);
+        return res.close();
+      };
+      return (typeof (_a = exports.routes[path].process) !== "undefined" && _a !== null) ? exports.routes[path].process({
+        deliver: deliver
+      }) : deliver();
     } else {
       exports.error(res);
+      return res.close();
     }
-    return res.close();
   }).listen(5678, 'localhost');
   sys.puts("Listening on port 5678");
 })();

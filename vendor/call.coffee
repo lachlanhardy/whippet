@@ -30,19 +30,24 @@ http.createServer((req, res) ->
       contentType: types[extension[2]] 
     else
       contentType: "text/html"
-
-    if exports.routes[path].process
-      exports.routes[path].process()
-    file: exports.routes[path].GET
-    sys.puts file
-    if file?
-      res.writeHead 200, {'Content-Type': contentType}
-      res.write file()
+      
+    deliver: ->
+      file: exports.routes[path].GET
+      if file?
+        res.writeHead 200, {'Content-Type': contentType}
+        
+        res.write file()
+      else
+        exports.error(res)
+      sys.puts path
+      res.close()
+      
+    if exports.routes[path].process?
+      exports.routes[path].process {deliver: deliver}
     else
-      exports.error(res)
-    sys.puts path
+      deliver()
   else
     exports.error(res)
-  res.close()
+    res.close()
 ).listen 5678, 'localhost'
 sys.puts "Listening on port 5678"
