@@ -5,12 +5,21 @@ url: require("url")
 
 exports.routes: {}
 
-exports.get: (path, file, process) ->
+exports.get: ->
+  if typeof arguments[arguments.length-1] is "function"
+    process: arguments.pop()
+
+  path: arguments[0]
+  if arguments.length is 1
+    file: path.substring(1)
+  else
+    file: arguments[1]
+
   exports.routes[path] ||= {}
   exports.routes[path].GET: ->
     fs.readFileSync file
   exports.routes[path].process: process if process?
-
+ 
 exports.error: (res) ->
   res.writeHead 404, {'Content-Type': 'text/html'}
   res.write "No route matched."

@@ -5,7 +5,12 @@
   sys = require("sys");
   url = require("url");
   exports.routes = {};
-  exports.get = function get(path, file, process) {
+  exports.get = function get() {
+    var file, path, process;
+    arguments = Array.prototype.slice.call(arguments, 0);
+    typeof arguments[arguments.length - 1] === "function" ? (process = arguments.pop()) : null;
+    path = arguments[0];
+    arguments.length === 1 ? (file = path.substring(1)) : (file = arguments[1]);
     exports.routes[path] = exports.routes[path] || {};
     exports.routes[path].GET = function GET() {
       return fs.readFileSync(file);
